@@ -459,15 +459,16 @@
       return;
     }
     var guess = state.currentGuess;
+    var candidatesBeforeThisGuess = state.candidates;
 
     if(a === state.len){
-      state.history.push({guess: guess, a: a, b: b});
+      state.history.push({guess: guess, a: a, b: b, prevCandidates: candidatesBeforeThisGuess});
       showWin(guess);
       return;
     }
 
     // filter candidates
-    var filtered = state.candidates.filter(function(c){
+    var filtered = candidatesBeforeThisGuess.filter(function(c){
       if(c === guess) return false;
       var r = evaluate(guess, c);
       return r[0] === a && r[1] === b;
@@ -478,7 +479,7 @@
       return;
     }
 
-    state.history.push({guess: guess, a: a, b: b});
+    state.history.push({guess: guess, a: a, b: b, prevCandidates: candidatesBeforeThisGuess});
     state.candidates = filtered;
     state.aVal = 0; state.bVal = 0;
     state.currentGuess = nextGuess(state.candidates);
@@ -487,19 +488,12 @@
 
   document.getElementById('undoBtn').addEventListener('click', function(){
     if(state.history.length === 0) return;
-    state.history.pop();
-    state.candidates = generateCandidates(state.len, state.repeat);
-    for(var i=0;i<state.history.length;i++){
-      var h = state.history[i];
-      state.candidates = state.candidates.filter(function(c){
-        if(c === h.guess) return false;
-        var r = evaluate(h.guess, c);
-        return r[0] === h.a && r[1] === h.b;
-      });
-    }
-    state.currentGuess = state.history.length > 0
-      ? nextGuess(state.candidates)
-      : nextGuess(state.candidates);
+    var last = state.history.pop();
+    // restore the exact guess and candidate set that were active
+    // before that guess was submitted, instead of recomputing
+    // (recomputing can pick a different guess due to sampling).
+    state.candidates = last.prevCandidates;
+    state.currentGuess = last.guess;
     state.aVal = 0; state.bVal = 0;
     renderGame();
   });
