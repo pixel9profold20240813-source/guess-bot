@@ -1,4 +1,4 @@
-const CACHE_NAME = 'guess-bot-v1';
+const CACHE_NAME = 'guess-bot-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -23,14 +23,15 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Network-first: always try to fetch the latest version. Only fall back
+// to the cache when offline, so deploys show up immediately instead of
+// being masked by a stale cached copy.
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      return cached || fetch(event.request).then((resp) => {
-        const copy = resp.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-        return resp;
-      }).catch(() => cached);
-    })
+    fetch(event.request).then((resp) => {
+      const copy = resp.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+      return resp;
+    }).catch(() => caches.match(event.request))
   );
 });
