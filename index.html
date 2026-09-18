@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解碼者 — 幾A幾B猜數字機器人</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0E1420">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#0E1420;
+    --panel:#161E2E;
+    --panel-2:#1C2536;
+    --line:#2A3548;
+    --text:#E9EDF3;
+    --muted:#7C8AA0;
+    --bull:#4FD1C5;
+    --cow:#F0A868;
+    --danger:#E4667A;
+    --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#F3F5F8;
+      --panel:#FFFFFF;
+      --panel-2:#EEF1F6;
+      --line:#DDE3ED;
+      --text:#161E2E;
+      --muted:#6B7688;
+      --bull:#0E9E8F;
+      --cow:#C97A2E;
+      --danger:#C2394E;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F3F5F8;
+    --panel:#FFFFFF;
+    --panel-2:#EEF1F6;
+    --line:#DDE3ED;
+    --text:#161E2E;
+    --muted:#6B7688;
+    --bull:#0E9E8F;
+    --cow:#C97A2E;
+    --danger:#C2394E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-ui);
+    display:flex;
+    justify-content:center;
+    padding:28px 16px 60px;
+  }
+  .wrap{width:100%;max-width:520px;}
+  h1{
+    font-size:1.05rem;
+    font-weight:600;
+    letter-spacing:.02em;
+    margin:0 0 2px;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:.85rem;
+    margin:0 0 22px;
+    line-height:1.5;
+  }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .row:last-child{margin-bottom:0;}
+  label{font-size:.9rem;color:var(--muted);}
+  select{
+    background:var(--panel-2);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:7px 10px;
+    font-size:.9rem;
+    font-family:var(--font-ui);
+  }
+  .toggle{
+    position:relative;width:44px;height:24px;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:999px;cursor:pointer;flex-shrink:0;
+  }
+  .toggle.on{background:var(--bull);border-color:var(--bull);}
+  .toggle::after{
+    content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;
+    background:var(--bg);border-radius:50%;transition:transform .15s ease;
+  }
+  .toggle.on::after{transform:translateX(20px);background:var(--panel);}
+  button.primary{
+    width:100%;
+    background:var(--bull);
+    color:#0E1420;
+    border:none;
+    border-radius:8px;
+    padding:13px;
+    font-size:.95rem;
+    font-weight:600;
+    font-family:var(--font-ui);
+    cursor:pointer;
+    letter-spacing:.02em;
+  }
+  button.primary:active{opacity:.85;}
+  button.ghost{
+    width:100%;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    font-size:.85rem;
+    font-family:var(--font-ui);
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .guess-display{
+    text-align:center;
+    padding:26px 0 10px;
+  }
+  .guess-digits{
+    font-family:var(--font-mono);
+    font-size:2.6rem;
+    font-weight:700;
+    letter-spacing:.18em;
+    color:var(--text);
+  }
+  .guess-count{
+    color:var(--muted);
+    font-size:.8rem;
+    margin-top:6px;
+  }
+  .remain{
+    color:var(--muted);
+    font-size:.78rem;
+    text-align:center;
+    margin-top:2px;
+  }
+  .input-row{
+    display:flex;
+    gap:10px;
+    margin-top:18px;
+  }
+  .stepper{
+    flex:1;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    text-align:center;
+  }
+  .stepper .k{
+    font-size:.72rem;
+    color:var(--muted);
+    margin-bottom:6px;
+    display:block;
+  }
+  .stepper .ctrl{
+    display:flex;align-items:center;justify-content:center;gap:14px;
+  }
+  .stepper button{
+    width:30px;height:30px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    background:var(--panel);
+    color:var(--text);
+    font-size:1rem;
+    cursor:pointer;
+    font-family:var(--font-mono);
+  }
+  .stepper .val{
+    font-family:var(--font-mono);
+    font-size:1.3rem;
+    min-width:22px;
+  }
+  .stepper.a .val{color:var(--bull);}
+  .stepper.b .val{color:var(--cow);}
+  .legend{
+    text-align:center;color:var(--muted);font-size:.72rem;margin-top:14px;
+  }
+  .legend b.a{color:var(--bull);}
+  .legend b.b{color:var(--cow);}
+  .err{
+    color:var(--danger);
+    font-size:.82rem;
+    text-align:center;
+    margin-top:10px;
+    display:none;
+  }
+  .history{list-style:none;margin:0;padding:0;}
+  .history li{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid var(--line);
+    font-size:.9rem;
+  }
+  .history li:last-child{border-bottom:none;}
+  .history .idx{color:var(--muted);width:22px;font-family:var(--font-mono);font-size:.8rem;}
+  .history .digits{font-family:var(--font-mono);letter-spacing:.12em;flex:1;text-align:left;padding-left:8px;}
+  .history .score{font-family:var(--font-mono);font-size:.85rem;white-space:nowrap;}
+  .history .score .a{color:var(--bull);}
+  .history .score .b{color:var(--cow);}
+  .win{
+    text-align:center;
+    padding:8px 0 4px;
+  }
+  .win .digits{
+    font-family:var(--font-mono);
+    font-size:2.6rem;
+    font-weight:700;
+    letter-spacing:.18em;
+    color:var(--bull);
+  }
+  .win .msg{color:var(--muted);font-size:.88rem;margin-top:10px;line-height:1.6;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>解碼者</h1>
+  <p class="sub">幾A幾B猜數字機器人 — 你心裡想一個數字，機器人負責猜，你只需要回答幾A幾B。</p>
+
+  <div id="setup" class="panel">
+    <div class="row">
+      <label for="len">位數</label>
+      <select id="len">
+        <option value="3">3 位</option>
+        <option value="4" selected>4 位</option>
+        <option value="5">5 位</option>
+      </select>
+    </div>
+    <div class="row">
+      <label>允許數字重複</label>
+      <div class="toggle" id="repeatToggle"></div>
+    </div>
+    <button class="primary" id="startBtn">開始</button>
+  </div>
+
+  <div id="game" class="panel hidden">
+    <div class="guess-display">
+      <div class="guess-digits" id="guessDigits">----</div>
+      <div class="guess-count" id="guessCount">第 1 次猜測</div>
+      <div class="remain" id="remainCount"></div>
+    </div>
+
+    <div class="input-row">
+      <div class="stepper a">
+        <span class="k">A（位置對）</span>
+        <div class="ctrl">
+          <button id="aMinus">−</button>
+          <span class="val" id="aVal">0</span>
+          <button id="aPlus">+</button>
+        </div>
+      </div>
+      <div class="stepper b">
+        <span class="k">B（數字對位置錯）</span>
+        <div class="ctrl">
+          <button id="bMinus">−</button>
+          <span class="val" id="bVal">0</span>
+          <button id="bPlus">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend"><b class="a">A</b> 位置也對 · <b class="b">B</b> 數字對但位置不對</div>
+    <div class="err" id="errMsg"></div>
+
+    <button class="primary" id="submitBtn" style="margin-top:18px;">送出</button>
+    <button class="ghost" id="undoBtn">回上一步</button>
+    <button class="ghost" id="resetBtn">重新開始</button>
+  </div>
+
+  <div id="winPanel" class="panel hidden">
+    <div class="win">
+      <div class="digits" id="winDigits"></div>
+      <div class="msg" id="winMsg"></div>
+    </div>
+    <button class="primary" id="againBtn" style="margin-top:18px;">再玩一次</button>
+  </div>
+
+  <div id="historyPanel" class="panel hidden">
+    <ul class="history" id="historyList"></ul>
+  </div>
+</div>
+
+<script>
+(function(){
+  var state = {
+    len: 4,
+    repeat: false,
+    candidates: [],
+    history: [],   // {guess, a, b}
+    currentGuess: null,
+    aVal: 0,
+    bVal: 0
+  };
+
+  var setupEl = document.getElementById('setup');
+  var gameEl = document.getElementById('game');
+  var winEl = document.getElementById('winPanel');
+  var historyEl = document.getElementById('historyPanel');
+  var historyList = document.getElementById('historyList');
+  var repeatToggle = document.getElementById('repeatToggle');
+  var lenSelect = document.getElementById('len');
+
+  repeatToggle.addEventListener('click', function(){
+    repeatToggle.classList.toggle('on');
+  });
+
+  // ---- candidate generation ----
+  function generateCandidates(len, repeat){
+    var digits = ['0','1','2','3','4','5','6','7','8','9'];
+    var out = [];
+    function rec(prefix, used){
+      if(prefix.length === len){ out.push(prefix); return; }
+      for(var i=0;i<digits.length;i++){
+        var d = digits[i];
+        if(!repeat && used[d]) continue;
+        used[d] = true;
+        rec(prefix + d, used);
+        used[d] = false;
+      }
+    }
+    rec('', {});
+    return out;
+  }
+
+  function evaluate(guess, secret){
+    var len = guess.length;
+    var a = 0;
+    var gCount = {}, sCount = {};
+    for(var i=0;i<len;i++){
+      if(guess[i] === secret[i]) a++;
+      else {
+        gCount[guess[i]] = (gCount[guess[i]]||0) + 1;
+        sCount[secret[i]] = (sCount[secret[i]]||0) + 1;
+      }
+    }
+    var b = 0;
+    for(var d in gCount){
+      var s = sCount[d] || 0;
+      b += Math.min(gCount[d], s);
+    }
+    return [a,b];
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+
+  // pick next guess by minimax over a pooled sample of remaining candidates,
+  // evaluated against the full remaining candidate set.
+  function nextGuess(remaining){
+    if(remaining.length === 1) return remaining[0];
+    var pool = remaining.length > 400 ? shuffle(remaining).slice(0,400) : remaining;
+    var best = null, bestScore = Infinity, bestInRemain = false;
+    for(var i=0;i<pool.length;i++){
+      var g = pool[i];
+      var buckets = {};
+      var maxBucket = 0;
+      for(var j=0;j<remaining.length;j++){
+        var res = evaluate(g, remaining[j]);
+        var key = res[0]+'-'+res[1];
+        buckets[key] = (buckets[key]||0)+1;
+        if(buckets[key] > maxBucket) maxBucket = buckets[key];
+      }
+      var inRemain = remaining.indexOf(g) !== -1;
+      if(maxBucket < bestScore || (maxBucket === bestScore && inRemain && !bestInRemain)){
+        bestScore = maxBucket;
+        best = g;
+        bestInRemain = inRemain;
+      }
+    }
+    return best;
+  }
+
+  // ---- UI wiring ----
+  document.getElementById('startBtn').addEventListener('click', function(){
+    state.len = parseInt(lenSelect.value, 10);
+    state.repeat = repeatToggle.classList.contains('on');
+    if(state.repeat && state.len > 4){
+      showErr('允許重複時，位數上限為 4 位（避免計算量過大）。');
+      return;
+    }
+    state.candidates = generateCandidates(state.len, state.repeat);
+    state.history = [];
+    state.aVal = 0; state.bVal = 0;
+    state.currentGuess = nextGuess(state.candidates);
+    setupEl.classList.add('hidden');
+    winEl.classList.add('hidden');
+    gameEl.classList.remove('hidden');
+    historyEl.classList.remove('hidden');
+    renderGame();
+  });
+
+  function showErr(msg){
+    var e = document.getElementById('errMsg');
+    e.textContent = msg;
+    e.style.display = 'block';
+    setTimeout(function(){ e.style.display='none'; }, 2600);
+  }
+
+  function renderGame(){
+    document.getElementById('guessDigits').textContent = state.currentGuess.split('').join(' ');
+    document.getElementById('guessCount').textContent = '第 ' + (state.history.length+1) + ' 次猜測';
+    document.getElementById('remainCount').textContent = '剩餘可能：' + state.candidates.length + ' 種';
+    document.getElementById('aVal').textContent = state.aVal;
+    document.getElementById('bVal').textContent = state.bVal;
+    renderHistory();
+  }
+
+  function renderHistory(){
+    historyList.innerHTML = '';
+    for(var i=0;i<state.history.length;i++){
+      var h = state.history[i];
+      var li = document.createElement('li');
+      li.innerHTML =
+        '<span class="idx">'+(i+1)+'</span>' +
+        '<span class="digits">'+h.guess.split('').join(' ')+'</span>' +
+        '<span class="score"><span class="a">'+h.a+'A</span> <span class="b">'+h.b+'B</span></span>';
+      historyList.appendChild(li);
+    }
+  }
+
+  function clampSteppers(){
+    if(state.aVal < 0) state.aVal = 0;
+    if(state.bVal < 0) state.bVal = 0;
+    if(state.aVal > state.len) state.aVal = state.len;
+    if(state.aVal + state.bVal > state.len) state.bVal = state.len - state.aVal;
+  }
+
+  document.getElementById('aPlus').addEventListener('click', function(){ state.aVal++; clampSteppers(); renderGame(); });
+  document.getElementById('aMinus').addEventListener('click', function(){ state.aVal--; clampSteppers(); renderGame(); });
+  document.getElementById('bPlus').addEventListener('click', function(){ state.bVal++; clampSteppers(); renderGame(); });
+  document.getElementById('bMinus').addEventListener('click', function(){ state.bVal--; clampSteppers(); renderGame(); });
+
+  document.getElementById('submitBtn').addEventListener('click', function(){
+    var a = state.aVal, b = state.bVal;
+    if(a + b > state.len){
+      showErr('A + B 不能超過位數。');
+      return;
+    }
+    var guess = state.currentGuess;
+
+    if(a === state.len){
+      state.history.push({guess: guess, a: a, b: b});
+      showWin(guess);
+      return;
+    }
+
+    // filter candidates
+    var filtered = state.candidates.filter(function(c){
+      if(c === guess) return false;
+      var r = evaluate(guess, c);
+      return r[0] === a && r[1] === b;
+    });
+
+    if(filtered.length === 0){
+      showErr('沒有符合的候選數字了，回應可能有誤，請用「回上一步」修正。');
+      return;
+    }
+
+    state.history.push({guess: guess, a: a, b: b});
+    state.candidates = filtered;
+    state.aVal = 0; state.bVal = 0;
+    state.currentGuess = nextGuess(state.candidates);
+    renderGame();
+  });
+
+  document.getElementById('undoBtn').addEventListener('click', function(){
+    if(state.history.length === 0) return;
+    state.history.pop();
+    state.candidates = generateCandidates(state.len, state.repeat);
+    for(var i=0;i<state.history.length;i++){
+      var h = state.history[i];
+      state.candidates = state.candidates.filter(function(c){
+        if(c === h.guess) return false;
+        var r = evaluate(h.guess, c);
+        return r[0] === h.a && r[1] === h.b;
+      });
+    }
+    state.currentGuess = state.history.length > 0
+      ? nextGuess(state.candidates)
+      : nextGuess(state.candidates);
+    state.aVal = 0; state.bVal = 0;
+    renderGame();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', backToSetup);
+  document.getElementById('againBtn').addEventListener('click', backToSetup);
+
+  function backToSetup(){
+    gameEl.classList.add('hidden');
+    winEl.classList.add('hidden');
+    historyEl.classList.add('hidden');
+    setupEl.classList.remove('hidden');
+  }
+
+  function showWin(guess){
+    gameEl.classList.add('hidden');
+    winEl.classList.remove('hidden');
+    document.getElementById('winDigits').textContent = guess.split('').join(' ');
+    document.getElementById('winMsg').textContent = '猜對了！共用 ' + state.history.length + ' 次猜測。';
+    renderHistory();
+  }
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
