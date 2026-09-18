@@ -35,8 +35,10 @@
     color:var(--text);
     font-family:var(--font-ui);
     display:flex;
+    flex-direction:column;
+    align-items:center;
     justify-content:center;
-    padding:32px 16px 64px;
+    padding:32px 18px 64px;
     background:
       radial-gradient(720px 480px at 15% -8%, rgba(79,209,197,0.16), transparent 60%),
       radial-gradient(640px 520px at 100% 10%, rgba(124,156,255,0.14), transparent 55%),
@@ -44,12 +46,12 @@
       linear-gradient(165deg, var(--bg-1) 0%, var(--bg-0) 55%, #06080F 100%);
     background-attachment:fixed;
   }
-  .wrap{width:100%;max-width:520px;}
+  .wrap{width:100%;max-width:560px;}
   h1{
-    font-size:1.3rem;
+    font-size:1.65rem;
     font-weight:700;
     letter-spacing:.02em;
-    margin:0 0 4px;
+    margin:0 0 6px;
     background:linear-gradient(90deg, #7FF0E4, #93A9FF 60%, #C79CFF);
     -webkit-background-clip:text;
     background-clip:text;
@@ -58,8 +60,8 @@
   }
   .sub{
     color:var(--muted);
-    font-size:.85rem;
-    margin:0 0 24px;
+    font-size:1rem;
+    margin:0 0 26px;
     line-height:1.6;
   }
   .panel{
@@ -68,8 +70,8 @@
       linear-gradient(160deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)),
       var(--panel);
     border:1px solid var(--line);
-    border-radius:16px;
-    padding:22px;
+    border-radius:18px;
+    padding:26px;
     margin-bottom:18px;
     backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
@@ -77,20 +79,20 @@
       0 1px 0 rgba(255,255,255,0.06) inset,
       0 20px 40px -20px rgba(0,0,0,0.6);
   }
-  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;}
   .row:last-child{margin-bottom:0;}
-  label{font-size:.9rem;color:var(--muted);}
+  label{font-size:1rem;color:var(--muted);}
   select{
     background:var(--panel-2);
     color:var(--text);
     border:1px solid var(--line-strong);
-    border-radius:8px;
-    padding:8px 12px;
-    font-size:.9rem;
+    border-radius:9px;
+    padding:10px 14px;
+    font-size:1rem;
     font-family:var(--font-ui);
   }
   .toggle{
-    position:relative;width:46px;height:26px;background:var(--panel-2);
+    position:relative;width:52px;height:30px;background:var(--panel-2);
     border:1px solid var(--line-strong);border-radius:999px;cursor:pointer;flex-shrink:0;
     transition:background .2s ease, border-color .2s ease;
   }
@@ -100,47 +102,63 @@
     box-shadow:0 0 14px rgba(79,209,197,0.45);
   }
   .toggle::after{
-    content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;
+    content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;
     background:#0B0F1E;border-radius:50%;transition:transform .18s ease;
   }
-  .toggle.on::after{transform:translateX(20px);background:#0A1018;}
+  .toggle.on::after{transform:translateX(22px);background:#0A1018;}
   button.primary{
     width:100%;
     background:linear-gradient(90deg, var(--bull) 0%, var(--bull-2) 100%);
     color:#06101A;
     border:none;
-    border-radius:10px;
-    padding:14px;
-    font-size:.95rem;
+    border-radius:12px;
+    padding:16px;
+    font-size:1.05rem;
     font-weight:700;
     font-family:var(--font-ui);
     cursor:pointer;
     letter-spacing:.02em;
     box-shadow:0 8px 24px -8px rgba(79,209,197,0.55);
-    transition:transform .12s ease, box-shadow .12s ease;
+    transition:transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
   }
   button.primary:active{transform:translateY(1px) scale(.99);box-shadow:0 4px 14px -6px rgba(79,209,197,0.5);}
+  button.primary:disabled{cursor:default;opacity:.75;transform:none;}
   button.ghost{
     width:100%;
     background:var(--panel-2);
     color:var(--muted);
     border:1px solid var(--line-strong);
-    border-radius:10px;
-    padding:11px;
-    font-size:.85rem;
+    border-radius:12px;
+    padding:13px;
+    font-size:.95rem;
     font-family:var(--font-ui);
     cursor:pointer;
-    margin-top:9px;
+    margin-top:10px;
     transition:border-color .15s ease, color .15s ease;
   }
   button.ghost:active{border-color:var(--bull);color:var(--text);}
+  button.ghost:disabled{cursor:default;opacity:.6;}
+  .spinner{
+    display:inline-block;
+    width:18px;height:18px;
+    border:3px solid rgba(6,16,26,0.3);
+    border-top-color:#06101A;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    flex-shrink:0;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
   .guess-display{
     text-align:center;
-    padding:30px 0 12px;
+    padding:34px 0 14px;
   }
   .guess-digits{
     font-family:var(--font-mono);
-    font-size:2.7rem;
+    font-size:clamp(2.3rem, 9.5vw, 3.3rem);
     font-weight:700;
     letter-spacing:.2em;
     background:linear-gradient(90deg, #9FF7EC, #B9C7FF);
@@ -151,66 +169,66 @@
   }
   .guess-count{
     color:var(--muted);
-    font-size:.8rem;
-    margin-top:8px;
+    font-size:.92rem;
+    margin-top:10px;
   }
   .remain{
     color:var(--muted);
-    font-size:.78rem;
+    font-size:.86rem;
     text-align:center;
-    margin-top:2px;
+    margin-top:3px;
   }
   .input-row{
     display:flex;
-    gap:10px;
-    margin-top:20px;
+    gap:12px;
+    margin-top:24px;
   }
   .stepper{
     flex:1;
     background:var(--panel-2);
     border:1px solid var(--line-strong);
-    border-radius:10px;
-    padding:11px 12px;
+    border-radius:12px;
+    padding:14px 12px;
     text-align:center;
   }
   .stepper .k{
-    font-size:.72rem;
+    font-size:.8rem;
     color:var(--muted);
-    margin-bottom:7px;
+    margin-bottom:9px;
     display:block;
   }
   .stepper .ctrl{
-    display:flex;align-items:center;justify-content:center;gap:14px;
+    display:flex;align-items:center;justify-content:center;gap:16px;
   }
   .stepper button{
-    width:30px;height:30px;
-    border-radius:8px;
+    width:38px;height:38px;
+    border-radius:9px;
     border:1px solid var(--line-strong);
     background:linear-gradient(160deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
     color:var(--text);
-    font-size:1rem;
+    font-size:1.15rem;
     cursor:pointer;
     font-family:var(--font-mono);
   }
   .stepper button:active{border-color:var(--bull);}
   .stepper .val{
     font-family:var(--font-mono);
-    font-size:1.35rem;
-    min-width:22px;
+    font-size:1.6rem;
+    min-width:26px;
     font-weight:700;
   }
   .stepper.a .val{color:var(--bull);text-shadow:0 0 16px rgba(79,209,197,0.5);}
   .stepper.b .val{color:var(--cow);text-shadow:0 0 16px rgba(240,168,104,0.45);}
   .legend{
-    text-align:center;color:var(--muted);font-size:.72rem;margin-top:16px;
+    text-align:center;color:var(--muted);font-size:.82rem;margin-top:18px;
   }
   .legend b.a{color:var(--bull);}
   .legend b.b{color:var(--cow);}
   .err{
     color:var(--danger);
-    font-size:.82rem;
+    font-size:.9rem;
     text-align:center;
-    margin-top:10px;
+    margin-top:12px;
     display:none;
   }
   .history{list-style:none;margin:0;padding:0;}
@@ -218,23 +236,23 @@
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:11px 0;
+    padding:13px 0;
     border-bottom:1px solid var(--line);
-    font-size:.9rem;
+    font-size:1rem;
   }
   .history li:last-child{border-bottom:none;}
-  .history .idx{color:var(--muted);width:22px;font-family:var(--font-mono);font-size:.8rem;}
+  .history .idx{color:var(--muted);width:24px;font-family:var(--font-mono);font-size:.88rem;}
   .history .digits{font-family:var(--font-mono);letter-spacing:.12em;flex:1;text-align:left;padding-left:8px;color:#C7CEE3;}
-  .history .score{font-family:var(--font-mono);font-size:.85rem;white-space:nowrap;font-weight:700;}
+  .history .score{font-family:var(--font-mono);font-size:.98rem;white-space:nowrap;font-weight:700;}
   .history .score .a{color:var(--bull);}
   .history .score .b{color:var(--cow);}
   .win{
     text-align:center;
-    padding:10px 0 4px;
+    padding:12px 0 4px;
   }
   .win .digits{
     font-family:var(--font-mono);
-    font-size:2.8rem;
+    font-size:clamp(2.4rem, 10vw, 3.4rem);
     font-weight:700;
     letter-spacing:.2em;
     background:linear-gradient(90deg, var(--bull), var(--bull-2));
@@ -243,7 +261,7 @@
     -webkit-text-fill-color:transparent;
     filter:drop-shadow(0 0 26px rgba(79,209,197,0.5));
   }
-  .win .msg{color:var(--muted);font-size:.88rem;margin-top:12px;line-height:1.6;}
+  .win .msg{color:var(--muted);font-size:1rem;margin-top:14px;line-height:1.6;}
   .hidden{display:none;}
 </style>
 </head>
@@ -411,24 +429,39 @@
     return best;
   }
 
-  // ---- UI wiring ----
-  document.getElementById('startBtn').addEventListener('click', function(){
+  var startBtn = document.getElementById('startBtn');
+  var startBtnLabel = startBtn.textContent;
+
+  startBtn.addEventListener('click', function(){
     state.len = parseInt(lenSelect.value, 10);
     state.repeat = repeatToggle.classList.contains('on');
     if(state.repeat && state.len > 4){
       showErr('允許重複時，位數上限為 4 位（避免計算量過大）。');
       return;
     }
-    state.candidates = generateCandidates(state.len, state.repeat);
-    state.history = [];
-    state.aVal = 0; state.bVal = 0;
-    state.currentGuess = nextGuess(state.candidates);
-    setupEl.classList.add('hidden');
-    winEl.classList.add('hidden');
-    gameEl.classList.remove('hidden');
-    historyEl.classList.remove('hidden');
-    renderGame();
+    setBtnLoading(startBtn, '產生候選中…');
+    setTimeout(function(){
+      state.candidates = generateCandidates(state.len, state.repeat);
+      state.history = [];
+      state.aVal = 0; state.bVal = 0;
+      state.currentGuess = nextGuess(state.candidates);
+      setupEl.classList.add('hidden');
+      winEl.classList.add('hidden');
+      gameEl.classList.remove('hidden');
+      historyEl.classList.remove('hidden');
+      renderGame();
+      clearBtnLoading(startBtn, startBtnLabel);
+    }, 30);
   });
+
+  function setBtnLoading(btn, text){
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span><span>' + text + '</span>';
+  }
+  function clearBtnLoading(btn, originalText){
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
 
   function showErr(msg){
     var e = document.getElementById('errMsg');
@@ -471,7 +504,10 @@
   document.getElementById('bPlus').addEventListener('click', function(){ state.bVal++; clampSteppers(); renderGame(); });
   document.getElementById('bMinus').addEventListener('click', function(){ state.bVal--; clampSteppers(); renderGame(); });
 
-  document.getElementById('submitBtn').addEventListener('click', function(){
+  var submitBtn = document.getElementById('submitBtn');
+  var submitBtnLabel = submitBtn.textContent;
+
+  submitBtn.addEventListener('click', function(){
     var a = state.aVal, b = state.bVal;
     if(a + b > state.len){
       showErr('A + B 不能超過位數。');
@@ -486,23 +522,28 @@
       return;
     }
 
-    // filter candidates
-    var filtered = candidatesBeforeThisGuess.filter(function(c){
-      if(c === guess) return false;
-      var r = evaluate(guess, c);
-      return r[0] === a && r[1] === b;
-    });
+    setBtnLoading(submitBtn, '計算下一猜…');
+    setTimeout(function(){
+      // filter candidates
+      var filtered = candidatesBeforeThisGuess.filter(function(c){
+        if(c === guess) return false;
+        var r = evaluate(guess, c);
+        return r[0] === a && r[1] === b;
+      });
 
-    if(filtered.length === 0){
-      showErr('沒有符合的候選數字了，回應可能有誤，請用「回上一步」修正。');
-      return;
-    }
+      if(filtered.length === 0){
+        clearBtnLoading(submitBtn, submitBtnLabel);
+        showErr('沒有符合的候選數字了，回應可能有誤，請用「回上一步」修正。');
+        return;
+      }
 
-    state.history.push({guess: guess, a: a, b: b, prevCandidates: candidatesBeforeThisGuess});
-    state.candidates = filtered;
-    state.aVal = 0; state.bVal = 0;
-    state.currentGuess = nextGuess(state.candidates);
-    renderGame();
+      state.history.push({guess: guess, a: a, b: b, prevCandidates: candidatesBeforeThisGuess});
+      state.candidates = filtered;
+      state.aVal = 0; state.bVal = 0;
+      state.currentGuess = nextGuess(state.candidates);
+      renderGame();
+      clearBtnLoading(submitBtn, submitBtnLabel);
+    }, 30);
   });
 
   document.getElementById('undoBtn').addEventListener('click', function(){
